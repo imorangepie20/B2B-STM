@@ -19,4 +19,5 @@ infra/runtime
 *.log
 .env
 .env.*
+.demo-credentials*
 !.env.example

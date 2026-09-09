@@ -21,6 +21,7 @@ require_key() {
   key=$2
   grep -Eq "^${key}=.+" "$file" || fail "$(basename "$file") is missing $key"
   grep -Eq "^${key}=REPLACE_" "$file" && fail "$(basename "$file") still contains a placeholder for $key"
+  return 0
 }
 
 [ -d "$SECRETS_DIR" ] || fail "secret directory does not exist"

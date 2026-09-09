@@ -17,6 +17,8 @@ REVOKE ALL ON DATABASE b2b_stm FROM PUBLIC;
 REVOKE CREATE ON SCHEMA public FROM PUBLIC;
 
 CREATE ROLE b2b_stm_app LOGIN NOSUPERUSER NOCREATEDB NOCREATEROLE NOINHERIT PASSWORD :'app_password';
+-- Historical migration 0005 also grants this role; it must never allow login here.
+CREATE ROLE b2b_stm_test_app NOLOGIN;
 GRANT CONNECT ON DATABASE b2b_stm TO b2b_stm_app;
 GRANT USAGE ON SCHEMA public TO b2b_stm_app;
 GRANT SELECT, INSERT, UPDATE, DELETE ON ALL TABLES IN SCHEMA public TO b2b_stm_app;

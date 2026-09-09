@@ -108,7 +108,7 @@ infra/scripts/verify-deployment.sh
 
 ## 7. 운영 확인과 롤백
 
-비인증 `/admin`, `/portal/orders`, `/warehouse/shipments`가 `/login`으로 이동하는지, 관리자 MFA와 DEMO 역할별 로그인이 되는지, DEMO 거래처 3개·상품 12개·주문 6개 및 후속 업무가 보이는지 브라우저에서 확인한다. 정상 첨부 업로드와 EICAR 거부, ClamAV 중단 시 readiness 503·첨부 거부, 재시작 후 200 복구를 확인한다.
+비인증 `/admin`, `/portal/orders`, `/warehouse/shipments`가 로그인 페이지 `/`로 이동하는지, 관리자 MFA와 DEMO 역할별 로그인이 되는지, DEMO 거래처 3개·상품 12개·주문 6개 및 후속 업무가 보이는지 브라우저에서 확인한다. 세션 이동은 클라이언트에서 실행되므로 curl만으로 판정하지 않는다. 정상 첨부 업로드와 EICAR 거부, ClamAV 중단 시 readiness 503·첨부 거부, 재시작 후 200 복구를 확인한다.
 
 ```bash
 docker compose --env-file infra/secrets/compose.env -p b2b-stm -f infra/compose.zorin.yml logs --since 30m api web clamav tunnel

@@ -32,7 +32,7 @@ services:
       timeout: 10s
       retries: 30
       start_period: 120s
-    networks: [backend]
+    networks: [backend, egress]
     logging: *default-logging
 
   api:
@@ -73,7 +73,7 @@ services:
     ports:
       - "127.0.0.1:3101:3101"
     healthcheck:
-      test: ["CMD", "node", "-e", "fetch('http://127.0.0.1:3101/login').then(r=>{if(!r.ok)process.exit(1)}).catch(()=>process.exit(1))"]
+      test: ["CMD", "node", "-e", "fetch('http://127.0.0.1:3101/').then(r=>{if(!r.ok)process.exit(1)}).catch(()=>process.exit(1))"]
       interval: 15s
       timeout: 5s
       retries: 10
