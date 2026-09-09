@@ -61,11 +61,11 @@ jobs:
       - name: Apply test migrations
         run: node scripts/migrate.mjs --test
 
-      - name: Run foundation tests
-        run: npm run test:foundation
-
       - name: Build API
         run: npm run build:api
+
+      - name: Run foundation tests
+        run: npm run test:foundation
 
       - name: Build Web
         run: npm run build:web
