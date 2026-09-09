@@ -64,3 +64,51 @@ test('readiness requires a healthy configured attachment scanner',async()=>{
     try{await app.listen(0,'127.0.0.1');assert.equal((await fetch(`${await app.getUrl()}/api/health/ready`)).status,status);}finally{await app.close();}
   });
 });
+
+test('API emits a server request ID and a safe structured completion log', async () => {
+  const lines = [];
+  const originalLog = console.log;
+  console.log = value => lines.push(String(value));
+  const app = await createApplication({ DATABASE_URL: process.env.TEST_DATABASE_URL });
+  try {
+    await app.listen(0, '127.0.0.1');
+    const supplied = 'client-controlled-request-id';
+    const response = await fetch(`${await app.getUrl()}/api/health/live?ignored=secret`, { headers: { 'x-request-id': supplied } });
+    assert.equal(response.status, 200);
+    const requestId = response.headers.get('x-request-id');
+    assert.match(requestId, /^[0-9a-f-]{36}$/i);
+    assert.notEqual(requestId, supplied);
+    const entry = lines.map(line => { try { return JSON.parse(line); } catch { return null; } }).find(value => value?.requestId === requestId);
+    assert(entry);
+    assert.deepEqual(Object.keys(entry).sort(), ['durationMs','level','method','requestId','route','status','timestamp'].sort());
+    assert.equal(entry.route, '/api/health/live');
+    assert.equal(entry.status, 200);
+    assert.equal(JSON.stringify(entry).includes('ignored'), false);
+    assert.equal(JSON.stringify(entry).includes('cookie'), false);
+  } finally {
+    console.log = originalLog;
+    await app.close();
+  }
+});
+
+test('unexpected API errors log classification without the exception message', () => {
+  const { SafeExceptionFilter } = require('../../apps/api/dist/observability/request-observability.js');
+  const lines = [];
+  const originalError = console.error;
+  console.error = value => lines.push(String(value));
+  let status;
+  let body;
+  const response = { status(value) { status = value; return this; }, json(value) { body = value; return this; } };
+  const host = { switchToHttp: () => ({ getRequest: () => ({ res: { locals: { requestId: 'request-1' } } }), getResponse: () => response }) };
+  try {
+    new SafeExceptionFilter().catch(new Error('postgresql://user:secret@example.test/b2b_stm'), host);
+  } finally { console.error = originalError; }
+  assert.equal(status, 500);
+  assert.deepEqual(body, { statusCode: 500, message: 'Internal server error' });
+  assert.equal(lines.length, 1);
+  const entry = JSON.parse(lines[0]);
+  assert.equal(entry.requestId, 'request-1');
+  assert.equal(entry.errorClass, 'Error');
+  assert.equal(lines[0].includes('postgresql://'), false);
+  assert.equal(lines[0].includes('secret'), false);
+});

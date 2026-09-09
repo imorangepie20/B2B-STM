@@ -39,6 +39,7 @@ import { AttachmentService } from './attachments/attachment.service';
 import { AttachmentMalwareScanner } from './attachments/attachment-malware-scanner';
 import { NotificationController } from './notifications/notification.controller';
 import { NotificationService } from './notifications/notification.service';
+import { requestIdMiddleware, SafeExceptionFilter } from './observability/request-observability';
 
 @Controller('health')
 @PublicEndpoint()
@@ -77,6 +78,8 @@ export async function createApplication(env: NodeJS.ProcessEnv = process.env) {
   class ApplicationModule {}
   try {
     const app = await NestFactory.create<NestExpressApplication>(ApplicationModule, { logger: false });
+    app.use(requestIdMiddleware);
+    app.useGlobalFilters(new SafeExceptionFilter());
     app.useBodyParser('raw', { type: ['image/jpeg','image/png','application/pdf'], limit: '10mb' });
     app.useBodyParser('json', { limit: '2mb' });
     app.use(cookieParser());
