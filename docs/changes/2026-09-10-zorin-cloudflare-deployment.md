@@ -4,6 +4,8 @@
 
 ### 도메인 연결 후 확인
 
+후속 확인: 사용자가 운영 system 관리자 생성과 MFA 등록을 완료했다. 서버에서 system 역할 계정 1개의 `account_active=true`, `mfa_confirmed=true`만 조회해 확인했다(비밀번호·MFA 비밀키 조회 없음). 외부 readiness 정상 및 GitHub availability 수동 실행 성공 확인. 인증된 첨부/EICAR·장애 복구·재부팅 검증은 여전히 남아 있다.
+
 사용자가 서버에 전용 토큰을 저장한 뒤 secret preflight 통과, tunnel 실행 및 Cloudflare 정상 연결을 확인했다. `stm.approid.team` DNS와 `http://web:3101` 경로를 생성했다. 서버 검증 스크립트의 local live·ready·Web 및 public Web·ready 5개 모두 HTTP 200이다. 실제 외부 브라우저에서 관리자·거래처 미인증 요청이 `/` 로그인으로 이동함을 확인했다. 장기 서비스 5개 모두 local 로그 드라이버와 10MB × 3 회전 설정 확인. 15분 availability schedule을 활성화한다. 아래 token 대기는 연결 전 기록이다.
 
 - `badd5f67f035d88b0f0f9371e9efc346273f8461`의 GitHub CI 전체 성공 확인: https://github.com/imorangepie20/B2B-STM/actions/runs/34415386474

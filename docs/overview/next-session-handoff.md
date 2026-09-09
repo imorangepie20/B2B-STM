@@ -53,6 +53,8 @@ API production build와 모의 `clamd` 핵심 검증은 통과했습니다. 현�
 `C:\Users\jowoo\B2B-STM\docs\overview\next-session-handoff.md를 읽고 다음 구현 순서 1번부터 이어서 진행해.`
 # 2026-09-10 배포 재개 지점
 
+추가 완료: 운영 system 관리자 계정 활성화 및 MFA confirmed를 DB의 boolean 상태로 확인했다. 관리자 bootstrap·MFA는 다시 수행하지 않는다. 다음 검증은 인증된 업무/첨부 및 장애 복구이며 재부팅은 직전 승인 필요.
+
 최신 상태: 전용 token 입력·tunnel 연결·DNS 경로 생성 완료. `https://stm.approid.team` Web과 API ready 200, 실제 브라우저 미인증 로그인 이동 확인. 다음은 system 관리자 bootstrap·MFA와 인증된 업무/첨부 검수이며 재부팅은 직전 승인 필요. 아래 token 입력 대기는 이전 기록이다.
 
 Zorin `~/apps/b2b-stm`에서 API·Web·PostgreSQL·ClamAV 네 서비스가 healthy. 서버 내부 Web 200·API ready 정상, 새 DEMO 생성 완료. `badd5f6`의 CI 전체 성공. 메일은 사용자 승인으로 비활성화.
