@@ -1,5 +1,9 @@
 # 현재 개발 인계
 
+## 2026-09-10 배포 진행
+
+Zorin 전용 스택의 API·Web·DB·ClamAV가 healthy이며 서버 내부 Web 200·API readiness 정상이다. 새 DEMO 데이터 생성 및 재실행 무변경을 확인했다. `badd5f6`의 GitHub CI 전체 통과. 사용자 승인으로 SMTP는 `MAIL_TRANSPORT=disabled` 상태다. Cloudflare 전용 터널은 생성했으나 token 입력 대기이며 `stm.approid.team` 외부 연결은 미완료다. 상세 증거는 [배포 변경 기록](../changes/2026-09-10-zorin-cloudflare-deployment.md)을 참조한다.
+
 최종 갱신: 2026-09-09.
 
 새 대화에서는 [다음 대화 작업 인계](next-session-handoff.md)를 먼저 확인합니다.

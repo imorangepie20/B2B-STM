@@ -1,5 +1,15 @@
 # Zorin 배포 준비 및 검증
 
+## 실제 서버 진행 상태
+
+- `badd5f67f035d88b0f0f9371e9efc346273f8461`의 GitHub CI 전체 성공 확인: https://github.com/imorangepie20/B2B-STM/actions/runs/34415386474
+- Zorin `~/apps/b2b-stm`에 clone, 서버에서 API·Web 이미지 빌드 및 전용 비밀값 생성 완료.
+- PostgreSQL migration 38개 적용, 재실행 0개. DEMO 거래처 3·상품 12·주문 6 및 후속 업무 생성, 재실행 변경 0건.
+- API·Web·PostgreSQL·ClamAV 모두 healthy. 서버 내부 Web 200, API readiness `status: ok` 확인.
+- DEMO 자격 증명 파일 권한 600 확인. 기존 부동산 컨테이너 모두 계속 실행 중.
+- Cloudflare 전용 named tunnel 생성 완료. connector token 입력은 아직 없어 외부 연결·도메인 검증은 미완료.
+- system 관리자 bootstrap·MFA, 공개 브라우저 검수·EICAR·스캐너 중단 복구·재부팅은 아직 미검증.
+
 ## 구현과 수정
 
 독립 Compose 스택, API·Web Dockerfile, 운영 초기화 경계, API 요청 로그, GitHub CI 및 수동 가용성 검사를 추가했다. 업무 원장과 주문·재고·출고·정산 관계는 변경하지 않았다.
