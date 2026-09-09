@@ -24,7 +24,7 @@
     "perf:seed:target": "node --env-file=.env.local scripts/seed-performance-data.mjs --profile=target --confirm-reset",
     "perf:benchmark": "node --env-file=.env.local scripts/run-performance-benchmark.mjs",
     "db:migrate": "node --env-file=.env.local scripts/migrate.mjs --development",
-    "test:foundation": "node --env-file=.env.local --test --test-concurrency=1 scripts/tests/*.test.mjs",
+    "test:foundation": "node --env-file-if-exists=.env.local --test --test-concurrency=1 scripts/tests/*.test.mjs",
     "test:auth-redirect": "node --env-file=.env.local apps/web/e2e/login-flow.cjs",
     "test:fault-recovery": "node --env-file=.env.local --test scripts/tests/fault-recovery.test.mjs",
     "build:api": "npm run build --workspace=@b2b-stm/api",
