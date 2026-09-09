@@ -1,0 +1,37 @@
+{
+  "schema_version": 1,
+  "diagram_type": "architecture",
+  "meta": {
+    "title": "B2B 주문·재고·출고·정산 시스템",
+    "quality_profile": "showcase",
+    "viewBox": [1240, 720]
+  },
+  "components": [
+    { "id": "role-workspaces", "type": "external", "label": "역할별 사용자", "sublabel": "거래처 · 창고 · 관리자", "pos": [40, 300], "size": [150, 68] },
+    { "id": "next-web", "type": "frontend", "label": "Next.js Web", "sublabel": "역할별 workspace", "pos": [260, 300], "size": [150, 68] },
+    { "id": "nestjs-api", "type": "backend", "label": "NestJS API", "sublabel": "업무 명령 경계", "pos": [490, 300], "size": [150, 68] },
+    { "id": "identity", "type": "security", "label": "Identity", "sublabel": "session · CSRF · MFA · role", "pos": [720, 90], "size": [170, 72] },
+    { "id": "order-stock", "type": "backend", "label": "주문·재고·출고", "sublabel": "예약 · 부분 출고 · 정정", "pos": [720, 265], "size": [170, 76] },
+    { "id": "return-money", "type": "backend", "label": "반품·정산·입금", "sublabel": "검수 · 차감 · 배분", "pos": [720, 450], "size": [170, 76] },
+    { "id": "postgres", "type": "database", "label": "PostgreSQL", "sublabel": "원장 · 잔액 · 감사", "pos": [1010, 300], "size": [160, 72] },
+    { "id": "smtp", "type": "external", "label": "SMTP", "sublabel": "초대 · 재설정 메일", "pos": [1010, 90], "size": [160, 64] },
+    { "id": "csv", "type": "external", "label": "초기 CSV", "sublabel": "기준정보 · 초기 재고", "pos": [490, 520], "size": [150, 64] }
+  ],
+  "connections": [
+    { "id": "workspace-request", "from": "role-workspaces", "to": "next-web", "label": "HTTPS 업무 요청", "variant": "emphasis", "labelAt": [225, 382] },
+    { "id": "same-origin-api", "from": "next-web", "to": "nestjs-api", "label": "same-origin /api proxy", "variant": "emphasis", "labelAt": [450, 296] },
+    { "id": "identity-guard", "from": "nestjs-api", "to": "identity", "label": "인증·권한 검사", "variant": "security" },
+    { "id": "order-command", "from": "nestjs-api", "to": "order-stock", "label": "주문·재고 명령", "labelAt": [780, 215] },
+    { "id": "money-command", "from": "nestjs-api", "to": "return-money", "label": "반품·정산 명령" },
+    { "id": "identity-state", "from": "identity", "to": "postgres", "label": "계정·세션 SQL", "variant": "security" },
+    { "id": "stock-transaction", "from": "order-stock", "to": "postgres", "label": "원자적 SQL transaction", "variant": "emphasis", "labelAt": [950, 550] },
+    { "id": "money-transaction", "from": "return-money", "to": "postgres", "label": "원장·마감 SQL", "variant": "emphasis" },
+    { "id": "account-mail", "from": "identity", "to": "smtp", "label": "SMTP 전달", "variant": "dashed" },
+    { "id": "csv-import", "from": "csv", "to": "nestjs-api", "label": "preview → transaction", "variant": "dashed" }
+  ],
+  "cards": [
+    { "dot": "cyan", "title": "하나의 업무 기준", "items": ["세 역할이 같은 주문·재고·정산 기록을 조회", "웹은 DB를 직접 변경하지 않고 API 명령 사용"] },
+    { "dot": "emerald", "title": "정합성과 복구", "items": ["행 잠금과 idempotency로 동시·중복 요청 제어", "재고·매출·반품·입금 원장을 원본 기록으로 보존"] },
+    { "dot": "rose", "title": "접근 통제", "items": ["서버에서 거래처 소속과 역할을 검사", "관리 업무는 MFA 확인 세션과 감사 이력 적용"] }
+  ]
+}

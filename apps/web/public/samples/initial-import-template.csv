@@ -1,0 +1,8 @@
+recordType,code,name,saleUnit,customerCode,sku,warehouseCode,quantity,unitPrice
+customer,SAMPLE-CUSTOMER,샘플 거래처,,,,,,
+supplier,SAMPLE-SUPPLIER,샘플 공급처,,,,,,
+warehouse,SAMPLE-WH,샘플 창고,,,,,,
+product,,샘플 종이컵 12oz,BOX,,SAMPLE-CUP-12,,,
+price,,,,SAMPLE-CUSTOMER,SAMPLE-CUP-12,,,12500
+stock,,,,,SAMPLE-CUP-12,SAMPLE-WH,100,
+
