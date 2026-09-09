@@ -50,6 +50,14 @@ jobs:
       - name: Install dependencies
         run: npm ci
 
+      - name: Create migration grant roles
+        env:
+          PGPASSWORD: postgres
+        run: |
+          psql -h 127.0.0.1 -U postgres -d b2b_stm_test -v ON_ERROR_STOP=1 \
+            -c "CREATE ROLE b2b_stm_app NOLOGIN" \
+            -c "CREATE ROLE b2b_stm_test_app NOLOGIN"
+
       - name: Apply test migrations
         run: node scripts/migrate.mjs --test
 
