@@ -2,6 +2,8 @@
 
 ## 2026-09-10 배포 진행
 
+최신: `https://stm.approid.team` 공개 연결 완료. Tunnel 정상, 외부 Web·API readiness HTTP 200, 브라우저 미인증 로그인 이동 확인. 메일은 비활성 상태이며 system 관리자 bootstrap·MFA, 인증된 첨부/EICAR·장애 복구·재부팅 검증은 남아 있다. 아래 token 대기는 이전 진행 기록이다.
+
 Zorin 전용 스택의 API·Web·DB·ClamAV가 healthy이며 서버 내부 Web 200·API readiness 정상이다. 새 DEMO 데이터 생성 및 재실행 무변경을 확인했다. `badd5f6`의 GitHub CI 전체 통과. 사용자 승인으로 SMTP는 `MAIL_TRANSPORT=disabled` 상태다. Cloudflare 전용 터널은 생성했으나 token 입력 대기이며 `stm.approid.team` 외부 연결은 미완료다. 상세 증거는 [배포 변경 기록](../changes/2026-09-10-zorin-cloudflare-deployment.md)을 참조한다.
 
 최종 갱신: 2026-09-09.

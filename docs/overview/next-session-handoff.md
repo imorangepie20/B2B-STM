@@ -53,6 +53,8 @@ API production build와 모의 `clamd` 핵심 검증은 통과했습니다. 현�
 `C:\Users\jowoo\B2B-STM\docs\overview\next-session-handoff.md를 읽고 다음 구현 순서 1번부터 이어서 진행해.`
 # 2026-09-10 배포 재개 지점
 
+최신 상태: 전용 token 입력·tunnel 연결·DNS 경로 생성 완료. `https://stm.approid.team` Web과 API ready 200, 실제 브라우저 미인증 로그인 이동 확인. 다음은 system 관리자 bootstrap·MFA와 인증된 업무/첨부 검수이며 재부팅은 직전 승인 필요. 아래 token 입력 대기는 이전 기록이다.
+
 Zorin `~/apps/b2b-stm`에서 API·Web·PostgreSQL·ClamAV 네 서비스가 healthy. 서버 내부 Web 200·API ready 정상, 새 DEMO 생성 완료. `badd5f6`의 CI 전체 성공. 메일은 사용자 승인으로 비활성화.
 
 다음은 전용 Cloudflare token 입력 확인 → tunnel 시작 → `stm.approid.team`을 `http://web:3101`에 연결 → 외부 인증·첨부 검증 순서다. Token은 `infra/secrets/tunnel.env`에 아직 없다. 값은 출력하지 않는다. 서버에서 `bash infra/scripts/set-tunnel-token.sh`로 숨김 입력할 수 있다. 관리자 bootstrap·MFA와 재부팅 검증도 남아 있다. 재부팅은 기존 부동산 서비스에 영향이 있어 직전 승인이 필요하다.

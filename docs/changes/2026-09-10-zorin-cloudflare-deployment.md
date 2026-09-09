@@ -2,6 +2,10 @@
 
 ## 실제 서버 진행 상태
 
+### 도메인 연결 후 확인
+
+사용자가 서버에 전용 토큰을 저장한 뒤 secret preflight 통과, tunnel 실행 및 Cloudflare 정상 연결을 확인했다. `stm.approid.team` DNS와 `http://web:3101` 경로를 생성했다. 서버 검증 스크립트의 local live·ready·Web 및 public Web·ready 5개 모두 HTTP 200이다. 실제 외부 브라우저에서 관리자·거래처 미인증 요청이 `/` 로그인으로 이동함을 확인했다. 장기 서비스 5개 모두 local 로그 드라이버와 10MB × 3 회전 설정 확인. 15분 availability schedule을 활성화한다. 아래 token 대기는 연결 전 기록이다.
+
 - `badd5f67f035d88b0f0f9371e9efc346273f8461`의 GitHub CI 전체 성공 확인: https://github.com/imorangepie20/B2B-STM/actions/runs/34415386474
 - Zorin `~/apps/b2b-stm`에 clone, 서버에서 API·Web 이미지 빌드 및 전용 비밀값 생성 완료.
 - PostgreSQL migration 38개 적용, 재실행 0개. DEMO 거래처 3·상품 12·주문 6 및 후속 업무 생성, 재실행 변경 0건.
