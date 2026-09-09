@@ -6,7 +6,7 @@ x-logging: &default-logging
 
 services:
   postgres:
-    image: postgres:16.15-alpine
+    image: postgres:16.15-alpine@sha256:cf78e76683b9ca8c5733cbbdce6c9262b45b6767934dd0a95e671f9a0fc20685
     restart: unless-stopped
     env_file: ./secrets/database.env
     volumes:
@@ -22,7 +22,7 @@ services:
     logging: *default-logging
 
   clamav:
-    image: clamav/clamav:stable
+    image: clamav/clamav:stable@sha256:1fdfd24c6f0a0fb60788481487459a6d4eda8a9b448641594e04db8410d34422
     restart: unless-stopped
     volumes:
       - clamav-data:/var/lib/clamav
@@ -82,7 +82,7 @@ services:
     logging: *default-logging
 
   tunnel:
-    image: cloudflare/cloudflared:latest
+    image: cloudflare/cloudflared:latest@sha256:ff69a2225ad7c6f85ed84fbd5f3087df46202426b2388ec60214098e0adf05e9
     profiles: [tunnel]
     restart: unless-stopped
     env_file: ./secrets/tunnel.env

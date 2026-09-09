@@ -74,7 +74,9 @@ jobs:
         run: npm run repo:verify-public
 
       - name: Validate Compose model
-        run: docker compose --env-file infra/secrets/compose.env.example -f infra/compose.zorin.yml config --no-env-resolution --no-path-resolution --quiet
+        run: |
+          for example in infra/secrets/*.env.example; do cp "$example" "${example%.example}"; done
+          docker compose --env-file infra/secrets/compose.env.example -f infra/compose.zorin.yml config --quiet
 
       - name: Build deployment images
         run: |

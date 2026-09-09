@@ -17,4 +17,8 @@
 
 ## 아직 완료하지 않은 항목
 
+사용자는 SMTP 준비 전 메일 없이 우선 배포하는 방식을 승인했다. `MAIL_TRANSPORT=disabled`를 명시하면 SMTP 요구만 해제하고 알림 worker는 꺼진다. 초대·재설정은 기존 수동 전달 동작을 사용하며 outbox는 발송하지 않는다. 메일 설정 누락 자체는 계속 오류로 처리한다. 운영 CSRF·ClamAV 검증은 유지한다. 해당 설정 경계 테스트 통과.
+
+Zorin에서 PostgreSQL·ClamAV·cloudflared 이미지를 pull하고 실제 digest로 Compose를 고정했다. 서버 비밀값 초기화 스크립트는 기존 파일 덮어쓰기를 거부하며 값은 출력하지 않는다.
+
 최종 커밋의 CI 성공, Zorin 애플리케이션 실행, Gmail SMTP 인증, Cloudflare Tunnel·도메인 연결, 외부 인증·첨부 검사와 재부팅 확인은 후속 검증이 필요하다. 실제 배포 완료나 운영 성능 달성으로 표시하지 않는다.

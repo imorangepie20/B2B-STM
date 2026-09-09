@@ -26,17 +26,19 @@ export function readConfig(env: NodeJS.ProcessEnv): ApiConfig {
     throw new Error('CSRF_SECRET must contain at least 32 random bytes encoded as hex');
   }
   if (env.MFA_ENCRYPTION_KEY !== undefined && !/^[a-fA-F0-9]{64}$/.test(env.MFA_ENCRYPTION_KEY)) throw new Error('MFA_ENCRYPTION_KEY must be 32 bytes in hex');
-  const wantsMail = env.SMTP_URL !== undefined || env.MAIL_FROM !== undefined || env.MAIL_TRANSPORT !== undefined;
-  if (production && (!env.SMTP_URL || !env.MAIL_FROM)) throw new Error('Production SMTP_URL and MAIL_FROM are required');
+  const mailDisabled = env.MAIL_TRANSPORT === 'disabled';
+  if (mailDisabled && (env.SMTP_URL || env.MAIL_FROM)) throw new Error('Disabled mail must not contain SMTP_URL or MAIL_FROM');
+  const wantsMail = !mailDisabled && (env.SMTP_URL !== undefined || env.MAIL_FROM !== undefined || env.MAIL_TRANSPORT !== undefined);
+  if (production && !mailDisabled && (!env.SMTP_URL || !env.MAIL_FROM)) throw new Error('Production SMTP_URL and MAIL_FROM are required');
   if (wantsMail && !env.MAIL_FROM?.trim()) throw new Error('MAIL_FROM is required for email delivery');
-  const transport = env.MAIL_TRANSPORT ?? (env.SMTP_URL ? 'smtp' : undefined);
+  const transport = mailDisabled ? undefined : env.MAIL_TRANSPORT ?? (env.SMTP_URL ? 'smtp' : undefined);
   if (transport && !['smtp','json'].includes(transport)) throw new Error('MAIL_TRANSPORT must be smtp or json');
   if (transport === 'smtp' && !env.SMTP_URL) throw new Error('SMTP_URL is required');
   if (transport === 'json' && production) throw new Error('JSON mail transport is unavailable in production');
   if (env.SMTP_URL) { const smtp = new URL(env.SMTP_URL); if (!['smtp:','smtps:'].includes(smtp.protocol)) throw new Error('SMTP_URL must use smtp or smtps'); }
   const mail = transport ? { transport: transport as 'smtp'|'json', smtpUrl: env.SMTP_URL, from: env.MAIL_FROM!.trim() } : undefined;
   if(env.NOTIFICATION_WORKER_ENABLED!==undefined&&!['true','false'].includes(env.NOTIFICATION_WORKER_ENABLED))throw new Error('NOTIFICATION_WORKER_ENABLED must be true or false');
-  const notificationWorkerEnabled=env.NOTIFICATION_WORKER_ENABLED?env.NOTIFICATION_WORKER_ENABLED==='true':production;
+  const notificationWorkerEnabled=!mailDisabled && (env.NOTIFICATION_WORKER_ENABLED?env.NOTIFICATION_WORKER_ENABLED==='true':production);
   const scanMode=env.ATTACHMENT_SCAN_MODE??(production?'clamav':'disabled');
   if(!['disabled','clamav'].includes(scanMode))throw new Error('ATTACHMENT_SCAN_MODE must be disabled or clamav');
   if(production&&scanMode!=='clamav')throw new Error('Production attachment scanning must use clamav');

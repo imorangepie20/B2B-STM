@@ -29,6 +29,11 @@ test('config rejects missing database and invalid ports without exposing secrets
   assert.throws(() => readConfig({ DATABASE_URL: productionUrl.toString(), NODE_ENV: 'production', APP_ORIGIN: 'https://stm.example.test', CSRF_SECRET: 'a'.repeat(64) }), /SMTP/);
   const production={ DATABASE_URL:productionUrl.toString(),NODE_ENV:'production',APP_ORIGIN:'https://stm.example.test',CSRF_SECRET:'a'.repeat(64),SMTP_URL:'smtps://smtp.example.test',MAIL_FROM:'STM <no-reply@example.test>' };
   assert.throws(()=>readConfig(production),/CLAMAV_HOST/);
+  const disabled={...production,SMTP_URL:undefined,MAIL_FROM:undefined,MAIL_TRANSPORT:'disabled',CLAMAV_HOST:'clamav'};
+  assert.equal(readConfig(disabled).mail,undefined);
+  assert.equal(readConfig(disabled).notificationWorkerEnabled,false);
+  assert.throws(()=>readConfig({...disabled,SMTP_URL:production.SMTP_URL}),/Disabled mail/);
+  assert.throws(()=>readConfig({...disabled,CLAMAV_HOST:undefined}),/CLAMAV_HOST/);
   assert.deepEqual(readConfig({...production,CLAMAV_HOST:'clamav'}).attachmentScanner,{host:'clamav',port:3310,timeoutMs:5000});
   assert.throws(()=>readConfig({DATABASE_URL:process.env.TEST_DATABASE_URL,ATTACHMENT_SCAN_MODE:'clamav',CLAMAV_HOST:'clamav',CLAMAV_PORT:'0'}),/CLAMAV_PORT/);
   assert.equal(readConfig({ DATABASE_URL: process.env.TEST_DATABASE_URL, MAIL_TRANSPORT: 'json', MAIL_FROM: 'STM <no-reply@example.test>' }).mail?.transport, 'json');

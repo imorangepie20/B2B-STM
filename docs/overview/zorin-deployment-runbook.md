@@ -32,6 +32,10 @@ git rev-parse HEAD
 
 ## 3. 서버 전용 비밀값
 
+현재 승인된 최초 배포는 메일 발송 비활성 모드다. `MAIL_TRANSPORT=disabled`와 `NOTIFICATION_WORKER_ENABLED=false`를 사용하고 `SMTP_URL`·`MAIL_FROM`은 설정하지 않는다. 추후 SMTP 사용 시 `MAIL_TRANSPORT=smtp`, SMTP 접속값·발신 주소, worker 활성화를 함께 설정한다. 알림 대기열을 검토한 뒤 worker를 켠다.
+
+새 서버에서는 Node 컨테이너로 `infra/scripts/initialize-secrets.mjs --confirm-new-b2b-stm`를 실행할 수 있다. 기존 `.env`가 하나라도 있으면 덮어쓰기를 거부한다. 이 경우 아래 예제 복사 단계는 생략한다. Tunnel token은 별도 입력해야 한다.
+
 ```bash
 cd ~/apps/b2b-stm
 install -d -m 700 infra/secrets

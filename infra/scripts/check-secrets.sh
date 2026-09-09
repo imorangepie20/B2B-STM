@@ -45,8 +45,10 @@ require_key "$SECRETS_DIR/migration.env" MIGRATION_DATABASE_URL
 require_key "$SECRETS_DIR/api.env" DATABASE_URL
 require_key "$SECRETS_DIR/api.env" CSRF_SECRET
 require_key "$SECRETS_DIR/api.env" MFA_ENCRYPTION_KEY
-require_key "$SECRETS_DIR/api.env" SMTP_URL
-require_key "$SECRETS_DIR/api.env" MAIL_FROM
+if ! grep -Fxq 'MAIL_TRANSPORT=disabled' "$SECRETS_DIR/api.env"; then
+  require_key "$SECRETS_DIR/api.env" SMTP_URL
+  require_key "$SECRETS_DIR/api.env" MAIL_FROM
+fi
 require_key "$SECRETS_DIR/web.env" API_BACKEND_ORIGIN
 require_key "$SECRETS_DIR/tunnel.env" TUNNEL_TOKEN
 
