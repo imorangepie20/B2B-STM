@@ -1,8 +1,17 @@
 import pg from 'pg';
 import { randomUUID } from 'node:crypto';
 import { createRequire } from 'node:module';
+import assert from 'node:assert/strict';
 
 const { hashPassword } = createRequire(import.meta.url)('../../apps/api/dist/identity/password.js');
+
+export function assertBootstrapDeploymentTarget(connectionString) {
+  const target = new URL(connectionString);
+  assert(['postgresql:', 'postgres:'].includes(target.protocol), 'PostgreSQL URL required');
+  assert.equal(target.pathname, '/b2b_stm', 'B2B production database required');
+  assert.equal(target.hostname, 'postgres', 'Compose PostgreSQL service required');
+  return target;
+}
 
 function validateCredentials(connectionString, email, password) {
   const target = new URL(connectionString);

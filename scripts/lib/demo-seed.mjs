@@ -69,6 +69,14 @@ export function assertDemoTarget(connectionString) {
   return target;
 }
 
+export function assertDemoDeploymentTarget(connectionString) {
+  const target = new URL(connectionString);
+  assert(['postgresql:', 'postgres:'].includes(target.protocol), 'PostgreSQL URL required');
+  assert.equal(target.pathname, '/b2b_stm', 'B2B production database required');
+  assert.equal(target.hostname, 'postgres', 'Compose PostgreSQL service required');
+  return target;
+}
+
 export function validateDemoDefinition(definition) {
   const ids = [
     ...definition.customers.map(item => item.id),

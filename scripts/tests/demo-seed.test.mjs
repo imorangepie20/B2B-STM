@@ -1,6 +1,6 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import { assertDemoTarget, demoId, validateDemoDefinition, demoDefinition } from '../lib/demo-seed.mjs';
+import { assertDemoDeploymentTarget, assertDemoTarget, demoId, validateDemoDefinition, demoDefinition } from '../lib/demo-seed.mjs';
 
 test('demo seed accepts only the local B2B development database', () => {
   assert.doesNotThrow(() => assertDemoTarget('postgresql://demo:secret@127.0.0.1:5432/b2b_stm'));
@@ -9,6 +9,15 @@ test('demo seed accepts only the local B2B development database', () => {
     'postgresql://demo:secret@example.test:5432/b2b_stm',
     'postgresql://demo:secret@127.0.0.1:5432/property_manager',
   ]) assert.throws(() => assertDemoTarget(target));
+});
+
+test('deployment demo seed accepts only the compose production database', () => {
+  assert.equal(assertDemoDeploymentTarget('postgresql://app:secret@postgres:5432/b2b_stm').hostname, 'postgres');
+  for (const target of [
+    'postgresql://app:secret@postgres:5432/b2b_stm_test',
+    'postgresql://app:secret@other-db:5432/b2b_stm',
+    'postgresql://app:secret@postgres:5432/property_manager',
+  ]) assert.throws(() => assertDemoDeploymentTarget(target));
 });
 
 test('demo identifiers are deterministic unique UUIDs and records stay in the DEMO namespace', () => {

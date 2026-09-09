@@ -2,6 +2,13 @@ import test from 'node:test';
 import assert from 'node:assert/strict';
 import { createHash, randomUUID } from 'node:crypto';
 import pg from 'pg';
+import { assertBootstrapDeploymentTarget } from '../lib/bootstrap-admin.mjs';
+
+test('deployment bootstrap accepts only the compose production database', () => {
+  assert.equal(assertBootstrapDeploymentTarget('postgresql://app:secret@postgres:5432/b2b_stm').hostname, 'postgres');
+  assert.throws(() => assertBootstrapDeploymentTarget('postgresql://app:secret@postgres:5432/b2b_stm_test'));
+  assert.throws(() => assertBootstrapDeploymentTarget('postgresql://app:secret@other-db:5432/b2b_stm'));
+});
 
 test('bootstrap creates exactly one administrator, and password reset is explicit', async () => {
   const module = await import('../lib/bootstrap-admin.mjs').catch(() => ({}));

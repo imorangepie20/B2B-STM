@@ -2,13 +2,21 @@ import assert from 'node:assert/strict';
 import { createHash, randomBytes } from 'node:crypto';
 import { existsSync } from 'node:fs';
 import { rename, unlink, writeFile } from 'node:fs/promises';
+import { pathToFileURL } from 'node:url';
 import argon2 from 'argon2';
 import pg from 'pg';
 import { assertNoIntegrityViolations, integritySql } from './lib/operational-integrity.mjs';
-import { assertDemoTarget, demoDefinition as demo, demoId, validateDemoDefinition } from './lib/demo-seed.mjs';
+import { assertDemoDeploymentTarget, assertDemoTarget, demoDefinition as demo, demoId, validateDemoDefinition } from './lib/demo-seed.mjs';
 
-const credentialsPath = new URL('../.demo-credentials.json', import.meta.url);
-const temporaryCredentialsPath = new URL(`../.demo-credentials.json.tmp-${process.pid}`, import.meta.url);
+const args = process.argv.slice(2);
+const deployment = args.length === 2 && args[0] === '--deployment' && args[1] === '--confirm-seed=B2B_STM_DEMO';
+const development = args.length === 1 && args[0] === '--development';
+assert(development || deployment, 'Select an explicit demo seed target');
+const deploymentCredentialsPath = '/run/b2b-stm-secrets/demo-credentials.json';
+if (deployment) assert.equal(process.env.DEMO_CREDENTIALS_PATH, deploymentCredentialsPath, 'Deployment credential path mismatch');
+const credentialsPath = deployment ? pathToFileURL(deploymentCredentialsPath) : new URL('../.demo-credentials.json', import.meta.url);
+const temporaryCredentialsPath = deployment ? pathToFileURL(`${deploymentCredentialsPath}.tmp-${process.pid}`) : new URL(`../.demo-credentials.json.tmp-${process.pid}`, import.meta.url);
+const credentialsLabel = deployment ? 'server secret credential file' : '.demo-credentials.json';
 const password = () => `Demo!${randomBytes(15).toString('base64url')}`;
 const occurredAt = daysAgo => new Date(Date.now() - daysAgo * 86_400_000 - 2 * 3_600_000);
 const businessDate = daysAgo => new Date(Date.now() - Math.min(daysAgo, 4) * 86_400_000).toISOString().slice(0, 10);
@@ -17,9 +25,9 @@ let temporaryCredentialsWritten = false;
 const db = new pg.Client({ connectionString: process.env.DATABASE_URL, connectionTimeoutMillis: 5_000, query_timeout: 30_000 });
 
 try {
-  assert.deepEqual(process.argv.slice(2), ['--development'], 'Run with explicit --development target');
   assert(process.env.DATABASE_URL, 'DATABASE_URL is required');
-  assertDemoTarget(process.env.DATABASE_URL);
+  if (deployment) assertDemoDeploymentTarget(process.env.DATABASE_URL);
+  else assertDemoTarget(process.env.DATABASE_URL);
   validateDemoDefinition(demo);
   await db.connect();
   await db.query('BEGIN');
@@ -32,15 +40,15 @@ try {
     assert.deepEqual(counts.rows[0], { products: demo.products.length, orders: demo.orders.length }, 'Unexpected partial DEMO records; seed refused');
     assert(existsSync(credentialsPath), 'Demo data exists but local credential file is missing');
     await db.query('ROLLBACK');
-    console.log('Demo data already present; no records changed. Credentials: .demo-credentials.json');
+    console.log(`Demo data already present; no records changed. Credentials: ${credentialsLabel}`);
     process.exit(0);
   }
-  assert(!existsSync(credentialsPath), '.demo-credentials.json already exists; seed refused');
+  assert(!existsSync(credentialsPath), `${credentialsLabel} already exists; seed refused`);
 
   const accountPasswords = Object.fromEntries(Object.keys(demo.users).map(key => [key, password()]));
   const accountHashes = Object.fromEntries(await Promise.all(Object.entries(accountPasswords).map(async ([key, value]) => [key, await argon2.hash(value, { type: argon2.argon2id })])));
   const credentialDocument = {
-    scope: 'local development only',
+    scope: deployment ? 'Zorin deployment only' : 'local development only',
     generatedAt: new Date().toISOString(),
     accounts: Object.fromEntries(Object.entries(demo.users).map(([key, user]) => [key, {
       email: user.email,
@@ -221,7 +229,7 @@ try {
   await rename(temporaryCredentialsPath, credentialsPath);
   temporaryCredentialsWritten = false;
   console.log('Demo data created: 3 customers, 12 products, 6 orders, 1 assigned shipment work, 1 pending return, 2 defect dispositions, 2 settlements, 2 payments, 1 refund, 3 notifications');
-  console.log('Credentials: .demo-credentials.json');
+  console.log(`Credentials: ${credentialsLabel}`);
 } catch (error) {
   await db.query('ROLLBACK').catch(() => {});
   const databaseError = error && typeof error === 'object' ? error : {};
