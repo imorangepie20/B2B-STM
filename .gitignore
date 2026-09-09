@@ -17,4 +17,8 @@ coverage/
 playwright-report/
 test-results/
 *.tsbuildinfo
+infra/secrets/*
+!infra/secrets/*.example
+infra/runtime/*
+!infra/runtime/.gitkeep
 docs/screenshots/recent-pages/admin-accounts-*.png
