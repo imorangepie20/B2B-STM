@@ -6,9 +6,9 @@ import { execFileSync } from 'node:child_process';
 const requiredIgnored = [
   '.env.local',
   '.demo-credentials.json',
-  'SDTPL_ADM',
-  'theme-preview',
-  '.logs',
+  'SDTPL_ADM/',
+  'theme-preview/',
+  '.logs/',
   'api.stdout.log',
   'docs/screenshots/recent-pages/admin-accounts-desktop.png',
 ];
