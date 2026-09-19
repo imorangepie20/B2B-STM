@@ -6,9 +6,9 @@ import { WorkspaceSessionGuard } from "@/components/layout/workspace-session-gua
 export default function AdminLayout({ children }: Readonly<{ children: React.ReactNode }>) {
   return (
     <WorkspaceSessionGuard workspace="admin"><SidebarProvider>
-      <div className="md:hidden"><AppSidebar /></div>
+      <AppSidebar />
       <SidebarInset>
-        <AppHeader role="admin" />
+        <AppHeader />
         <main className="mx-auto flex w-full max-w-[1600px] flex-1 flex-col gap-4 p-4 lg:px-8 lg:py-6">{children}</main>
       </SidebarInset>
     </SidebarProvider></WorkspaceSessionGuard>
