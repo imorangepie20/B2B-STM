@@ -21,6 +21,12 @@
 - `npm.cmd run test:foundation`: 79/79 통과했습니다.
 - 1440×900 PC와 390×844 모바일 관리자 화면을 캡처해 사이드바 고정 배치와 드로어 오버레이를 육안 확인했습니다.
 
+## 운영 배포 확인
+
+- GitHub CI가 `176f3b4489cf86bd34637ffbb4a65563f0cdc3d3`에서 성공한 뒤 Zorin 운영 서버를 fast-forward했습니다.
+- Web 이미지만 다시 빌드·교체했으며, 새 `b2b-stm-web` 컨테이너의 healthy 상태를 확인했습니다. API·DB·업무 데이터에는 변경이 없습니다.
+- 서버 내부 API live·ready, Web과 `https://stm.approid.team/`, `https://stm.approid.team/api/health/ready`가 모두 HTTP 200으로 확인됐습니다.
+
 ## 후속 검증
 
-- 전체 역할별 최근 화면 32개 시각 회귀와 운영 배포 반영은 별도로 수행합니다.
+- 전체 역할별 최근 화면 32개 시각 회귀는 별도로 수행합니다.
