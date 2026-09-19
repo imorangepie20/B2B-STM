@@ -5,12 +5,14 @@ import { WorkspaceSessionGuard } from "@/components/layout/workspace-session-gua
 
 export default function AdminLayout({ children }: Readonly<{ children: React.ReactNode }>) {
   return (
-    <WorkspaceSessionGuard workspace="admin"><SidebarProvider>
+    <SidebarProvider>
       <AppSidebar />
       <SidebarInset>
         <AppHeader />
-        <main className="mx-auto flex w-full max-w-[1600px] flex-1 flex-col gap-4 p-4 lg:px-8 lg:py-6">{children}</main>
+        <WorkspaceSessionGuard workspace="admin">
+          <main className="mx-auto flex w-full max-w-[1600px] flex-1 flex-col gap-4 p-4 lg:px-8 lg:py-6">{children}</main>
+        </WorkspaceSessionGuard>
       </SidebarInset>
-    </SidebarProvider></WorkspaceSessionGuard>
+    </SidebarProvider>
   )
 }

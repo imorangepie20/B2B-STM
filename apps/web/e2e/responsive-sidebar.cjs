@@ -7,9 +7,9 @@ const webOrigin = 'http://127.0.0.1:3101';
 const digest = value => createHash('sha256').update(value).digest('hex');
 
 const workspaces = [
-  { route: '/admin', userId: '9ea2eb6c-3b10-40d2-869e-1cce826f44ab', menu: '주문 관리', mobileTarget: '/admin/orders' },
-  { route: '/portal/orders', userId: 'd0000021-0000-4000-8000-000000000000', menu: '주문 내역', mobileTarget: '/portal/orders/history' },
-  { route: '/warehouse/shipments', userId: 'd0000023-0000-4000-8000-000000000000', menu: '배송 관리', mobileTarget: '/warehouse/deliveries' },
+  { route: '/admin', userId: '9ea2eb6c-3b10-40d2-869e-1cce826f44ab', menu: '주문 관리', desktopTarget: '/admin/orders', mobileTarget: '/admin/orders' },
+  { route: '/portal/orders', userId: 'd0000021-0000-4000-8000-000000000000', menu: '주문 내역', desktopTarget: '/portal/orders/history', mobileTarget: '/portal/orders/history' },
+  { route: '/warehouse/shipments', userId: 'd0000023-0000-4000-8000-000000000000', menu: '배송 관리', desktopTarget: '/warehouse/deliveries', mobileTarget: '/warehouse/deliveries' },
 ];
 
 async function createSession(db, userId) {
@@ -59,6 +59,31 @@ async function openWorkspace(browser, token, route, viewport) {
         await expect(sidebar).toHaveAttribute('data-state', 'collapsed');
         const collapsedWidth = (await sidebar.boundingBox())?.width ?? expandedWidth;
         assert(collapsedWidth < expandedWidth, `${workspace.route} desktop sidebar did not collapse`);
+
+        const timeOrigin = await page.evaluate(() => performance.timeOrigin);
+        let releaseAuthorization;
+        let authorizationRequested;
+        const authorizationRequest = new Promise(resolve => { authorizationRequested = resolve; });
+        const delayAuthorization = async route => {
+          authorizationRequested();
+          await new Promise(resolve => { releaseAuthorization = resolve; });
+          await route.continue();
+        };
+        await page.route('**/api/auth/me', delayAuthorization);
+
+        await sidebar.locator(`a[href="${workspace.desktopTarget}"]`).click();
+        await authorizationRequest;
+        await expect(page.locator('header')).toBeVisible();
+        const authorizationResponse = page.waitForResponse('**/api/auth/me');
+        releaseAuthorization();
+        await authorizationResponse;
+        await page.unroute('**/api/auth/me', delayAuthorization);
+        await expect(page).toHaveURL(`${webOrigin}${workspace.desktopTarget}`);
+        assert.equal(
+          await page.evaluate(() => performance.timeOrigin),
+          timeOrigin,
+          `${workspace.route} desktop sidebar navigation reloaded the document`,
+        );
       } finally {
         await context.close();
       }
